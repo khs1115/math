@@ -108,7 +108,11 @@ def LU(A,b):
                             elif A[row][f]==0:
                                 continue
                             else:
-                                ex+=f"{-A[row][f]}{ans[f]}"
+                                  if A[row][f]<0:
+                                    ex+=f"+{-A[row][f]}{ans[f]}" if ex else 
+                                    f"{-A[row][f]}{ans[f]}"
+
+                        
                         ans[col]=ex
             print(f"x={ans[0]} y={ans[1]} z={ans[2]}")
 
@@ -124,5 +128,6 @@ for _ in range(a):
     b = [x for x in map(float,input().split())]
 
     LU(A, b)
+
 
 
