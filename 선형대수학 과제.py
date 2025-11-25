@@ -7,7 +7,7 @@ def gauss(A):
                 pivot_val = abs(A[row][c])
                 pivot_row = row
 
-        if pivot_val == 0:
+        if pivot_val < 1e-10:  
             continue
 
         pivot = A[pivot_row][c]
@@ -17,17 +17,59 @@ def gauss(A):
         A[c]=[num/pivot for num in A[c]]
         
         for row in range(3):
-            if row!=c and A[row][c]!=0:
+            if row!=c and abs(A[row][c]) > 1e-10:  
                 k=A[row][c]
                 for j in range(4):
                     A[row][j]-=k*A[c][j]
 
-    for a in A:
-        if not any(a[:3]) and a[3] != 0:
-            print("해가 없습니다")
-            return False
+    rank_A = 0
+    for r in range(3):
+        if any(abs(A[r][c]) > 1e-10 for c in range(3)):  
+            rank_A += 1
 
-    print("무수히 많은 해를 가집니다.")
+    rank_A_aug = 0
+    for r in range(3):
+        if any(abs(A[r][c]) > 1e-10 for c in range(4)):  
+            rank_A_aug += 1
+
+    if rank_A < rank_A_aug:
+        print("해가 없습니다")
+        return False
+    
+    if rank_A < 3:
+        print("무수히 많은 해를 가집니다.")
+        pivot_cols = []
+        for r in range(3):
+            for c in range(3):
+                if abs(A[r][c]) > 1e-10:  
+                    pivot_cols.append(c)
+                    break
+        
+        free_cols = [i for i in range(3) if i not in pivot_cols]
+        ans = ['0'] * 3
+        
+        for i, f in enumerate(free_cols):
+            ans[f] = chr(ord('s') + i)
+        
+        for row in reversed(range(len(pivot_cols))):
+            col = pivot_cols[row]
+            expression = str(A[row][3])
+            
+            for f in free_cols:
+                coeff = A[row][f]
+                if abs(coeff) > 1e-10: 
+                    term = f"{abs(coeff)}{ans[f]}"
+                    if coeff > 0:
+                        expression += f"-{term}"
+                    else:
+                        expression += f"+{term}"
+
+            ans[col] = expression if expression != '0' else "0"
+            
+        print(f"x={ans[0]} y={ans[1]} z={ans[2]}")
+        return True
+    
+    print(f"해: x={A[0][3]}, y={A[1][3]}, z={A[2][3]}")
     return True
 
 
@@ -85,36 +127,8 @@ def LU(A,b):
 
     else:
         A=[A[i]+[b[i]] for i in range(3)]
-        if gauss(A):
-            pivot_cols = []
-            for r in range(3):
-                for c in range(3):
-                    if A[r][c] == 1 and all(A[r][k] == 0 for k in range(c)):
-                        pivot_cols.append(c)
-                        break
-            free_cols = [i for i in range(3) if i not in pivot_cols]
-            ans=[0,0,0]
-            for f in free_cols:
-                ans[f]=chr(ord('s')+f)
-            for row in range(3):
-                for col in range(3):
-                    if col in pivot_cols and A[row][col]==1:
-                        ex=str(A[row][3])
-                        for f in free_cols:
-                            if A[row][f]==1:
-                                ex+=f"-{ans[f]}"
-                            elif A[row][f]==-1:
-                                ex+=f"+{ans[f]}"
-                            elif A[row][f]==0:
-                                continue
-                            else:
-                                  if A[row][f]<0:
-                                    ex+=f"+{-A[row][f]}{ans[f]}" if ex else 
-                                    f"{-A[row][f]}{ans[f]}"
-
-                        
-                        ans[col]=ex
-            print(f"x={ans[0]} y={ans[1]} z={ans[2]}")
+        gauss(A)
+       
 
 
 
@@ -128,6 +142,4 @@ for _ in range(a):
     b = [x for x in map(float,input().split())]
 
     LU(A, b)
-
-
 
