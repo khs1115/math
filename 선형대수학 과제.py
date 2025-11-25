@@ -114,7 +114,7 @@ def LU(A,b):
 
 
 
-print("테스트케이스를 입력해주세요.")
+print("테스트케이스 입력 횟수를 입력해주세요.")
 a = int(input())
 for _ in range(a):
     A = [[],[],[]]
@@ -124,4 +124,5 @@ for _ in range(a):
     b = [x for x in map(float,input().split())]
 
     LU(A, b)
+
 
